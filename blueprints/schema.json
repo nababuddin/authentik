@@ -6477,7 +6477,8 @@
                             "totp",
                             "webauthn",
                             "duo",
-                            "sms"
+                            "sms",
+                            "mobile"
                         ],
                         "title": "Device classes"
                     },
