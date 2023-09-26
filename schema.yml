@@ -26726,6 +26726,7 @@ components:
       - authentik.sources.oauth
       - authentik.sources.plex
       - authentik.sources.saml
+      - authentik.sources.scim
       - authentik.stages.authenticator
       - authentik.stages.authenticator_duo
       - authentik.stages.authenticator_sms
@@ -26776,6 +26777,7 @@ components:
         * `authentik.sources.oauth` - authentik Sources.OAuth
         * `authentik.sources.plex` - authentik Sources.Plex
         * `authentik.sources.saml` - authentik Sources.SAML
+        * `authentik.sources.scim` - authentik Sources.SCIM
         * `authentik.stages.authenticator` - authentik Stages.Authenticator
         * `authentik.stages.authenticator_duo` - authentik Stages.Authenticator.Duo
         * `authentik.stages.authenticator_sms` - authentik Stages.Authenticator.SMS
@@ -29511,6 +29513,7 @@ components:
             * `authentik.sources.oauth` - authentik Sources.OAuth
             * `authentik.sources.plex` - authentik Sources.Plex
             * `authentik.sources.saml` - authentik Sources.SAML
+            * `authentik.sources.scim` - authentik Sources.SCIM
             * `authentik.stages.authenticator` - authentik Stages.Authenticator
             * `authentik.stages.authenticator_duo` - authentik Stages.Authenticator.Duo
             * `authentik.stages.authenticator_sms` - authentik Stages.Authenticator.SMS
@@ -29581,6 +29584,7 @@ components:
             * `authentik_sources_plex.plexsourceconnection` - User Plex Source Connection
             * `authentik_sources_saml.samlsource` - SAML Source
             * `authentik_sources_saml.usersamlsourceconnection` - User SAML Source Connection
+            * `authentik_sources_scim.scimsource` - SCIM Source
             * `authentik_stages_authenticator_duo.authenticatorduostage` - Duo Authenticator Setup Stage
             * `authentik_stages_authenticator_duo.duodevice` - Duo Device
             * `authentik_stages_authenticator_sms.authenticatorsmsstage` - SMS Authenticator Setup Stage
@@ -29704,6 +29708,7 @@ components:
             * `authentik.sources.oauth` - authentik Sources.OAuth
             * `authentik.sources.plex` - authentik Sources.Plex
             * `authentik.sources.saml` - authentik Sources.SAML
+            * `authentik.sources.scim` - authentik Sources.SCIM
             * `authentik.stages.authenticator` - authentik Stages.Authenticator
             * `authentik.stages.authenticator_duo` - authentik Stages.Authenticator.Duo
             * `authentik.stages.authenticator_sms` - authentik Stages.Authenticator.SMS
@@ -29774,6 +29779,7 @@ components:
             * `authentik_sources_plex.plexsourceconnection` - User Plex Source Connection
             * `authentik_sources_saml.samlsource` - SAML Source
             * `authentik_sources_saml.usersamlsourceconnection` - User SAML Source Connection
+            * `authentik_sources_scim.scimsource` - SCIM Source
             * `authentik_stages_authenticator_duo.authenticatorduostage` - Duo Authenticator Setup Stage
             * `authentik_stages_authenticator_duo.duodevice` - Duo Device
             * `authentik_stages_authenticator_sms.authenticatorsmsstage` - SMS Authenticator Setup Stage
@@ -31934,6 +31940,7 @@ components:
       - authentik_sources_plex.plexsourceconnection
       - authentik_sources_saml.samlsource
       - authentik_sources_saml.usersamlsourceconnection
+      - authentik_sources_scim.scimsource
       - authentik_stages_authenticator_duo.authenticatorduostage
       - authentik_stages_authenticator_duo.duodevice
       - authentik_stages_authenticator_sms.authenticatorsmsstage
@@ -32008,6 +32015,7 @@ components:
         * `authentik_sources_plex.plexsourceconnection` - User Plex Source Connection
         * `authentik_sources_saml.samlsource` - SAML Source
         * `authentik_sources_saml.usersamlsourceconnection` - User SAML Source Connection
+        * `authentik_sources_scim.scimsource` - SCIM Source
         * `authentik_stages_authenticator_duo.authenticatorduostage` - Duo Authenticator Setup Stage
         * `authentik_stages_authenticator_duo.duodevice` - Duo Device
         * `authentik_stages_authenticator_sms.authenticatorsmsstage` - SMS Authenticator Setup Stage
@@ -34928,6 +34936,7 @@ components:
             * `authentik.sources.oauth` - authentik Sources.OAuth
             * `authentik.sources.plex` - authentik Sources.Plex
             * `authentik.sources.saml` - authentik Sources.SAML
+            * `authentik.sources.scim` - authentik Sources.SCIM
             * `authentik.stages.authenticator` - authentik Stages.Authenticator
             * `authentik.stages.authenticator_duo` - authentik Stages.Authenticator.Duo
             * `authentik.stages.authenticator_sms` - authentik Stages.Authenticator.SMS
@@ -34998,6 +35007,7 @@ components:
             * `authentik_sources_plex.plexsourceconnection` - User Plex Source Connection
             * `authentik_sources_saml.samlsource` - SAML Source
             * `authentik_sources_saml.usersamlsourceconnection` - User SAML Source Connection
+            * `authentik_sources_scim.scimsource` - SCIM Source
             * `authentik_stages_authenticator_duo.authenticatorduostage` - Duo Authenticator Setup Stage
             * `authentik_stages_authenticator_duo.duodevice` - Duo Device
             * `authentik_stages_authenticator_sms.authenticatorsmsstage` - SMS Authenticator Setup Stage
