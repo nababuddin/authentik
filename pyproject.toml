@@ -12,7 +12,7 @@ reportOptionalSubscript = false
 # so we have to disable those for now
 reportGeneralTypeIssues = false
 verboseOutput = false
-pythonVersion = "3.11"
+pythonVersion = "3.12"
 pythonPlatform = "All"
 
 [tool.black]
@@ -154,7 +154,7 @@ pycryptodome = "*"
 pydantic = "<3.0.0"
 pydantic-scim = "^0.0.7"
 pyjwt = "*"
-python = "^3.11"
+python = "^3.12"
 pyyaml = "*"
 requests-oauthlib = "*"
 sentry-sdk = "*"
