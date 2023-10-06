@@ -1296,11 +1296,6 @@ Il y a <x id="0" equiv-text="${ago}"/> jour(s)</target>
         <target>Valider les certificats SSL des serveurs amonts.</target>
         
       </trans-unit>
-      <trans-unit id="s9c73dced379c37a2">
-        <source>Use this provider with nginx's auth_request or traefik's forwardAuth. Each application/domain needs its own provider. Additionally, on each domain, /outpost.goauthentik.io must be routed to the outpost (when using a manged outpost, this is done for you).</source>
-        <target>Utilisez ce fournisseur avec l'option "auth_request" de Nginx ou "forwardAuth" de Traefik. Chaque application/domaine a besoin de son propre fournisseur. De plus, sur chaque domaine, "/outpost.goauthentik.io" doit être routé vers le poste avancé (lorsque vous utilisez un poste avancé géré, cela est fait pour vous).</target>
-        
-      </trans-unit>
       <trans-unit id="s44c90273f08fb718">
         <source>Use this provider with nginx's auth_request or traefik's forwardAuth. Only a single provider is required per root domain. You can't do per-application authorization, but you don't have to create a provider for each application.</source>
         <target>Utilisez ce fournisseur avec auth_request de nginx ou forwardAuth de traefik. Un seul fournisseur est nécessaire par domaine racine. Vous ne pouvez pas faire d'autorisation par application, mais vous n'avez pas besoin de créer un fournisseur pour chaque application.</target>
@@ -4565,16 +4560,6 @@ doesn't pass when either or both of the selected options are equal or above the 
         <target>Info utilisateur</target>
         
       </trans-unit>
-      <trans-unit id="s06f79477aff0576c">
-        <source>To create a recovery link, the current tenant needs to have a recovery flow configured.</source>
-        <target>Pour créer un lien de récupération, le locataire actuel doit avoir un flux de récupération configuré.</target>
-        
-      </trans-unit>
-      <trans-unit id="sed80a99ca1491909">
-        <source>Reset Password</source>
-        <target>Réinitialiser le mot de passe</target>
-        
-      </trans-unit>
       <trans-unit id="sc44bae5cde0083fa">
         <source>Actions over the last week (per 8 hours)</source>
         <target>Actions au cours de la semaine écoulée (par tranche de 8 heures)</target>
@@ -7816,6 +7801,12 @@ Les liaisons avec les groupes/utilisateurs sont vérifiées par rapport à l'uti
 <trans-unit id="se9e9e1d6799b86a5">
   <source>WebAuthn not supported by browser.</source>
   <target>WebAuthn n'est pas supporté pas ce navigateur.</target>
+</trans-unit>
+<trans-unit id="sff0ac1ace2d90709">
+  <source>Use this provider with nginx's auth_request or traefik's forwardAuth. Each application/domain needs its own provider. Additionally, on each domain, /outpost.goauthentik.io must be routed to the outpost (when using a managed outpost, this is done for you).</source>
+</trans-unit>
+<trans-unit id="s08a54b6f77303e41">
+  <source>View recovery link</source>
 </trans-unit>
     </body>
   </file>

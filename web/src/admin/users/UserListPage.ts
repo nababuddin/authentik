@@ -21,10 +21,11 @@ import { getURLParam, updateURLParams } from "@goauthentik/elements/router/Route
 import { PaginatedResponse } from "@goauthentik/elements/table/Table";
 import { TableColumn } from "@goauthentik/elements/table/Table";
 import { TablePage } from "@goauthentik/elements/table/TablePage";
+import { writeToClipboard } from "@goauthentik/elements/utils/writeToClipboard";
 import "@patternfly/elements/pf-tooltip/pf-tooltip.js";
 
 import { msg, str } from "@lit/localize";
-import { CSSResult, TemplateResult, html } from "lit";
+import { CSSResult, TemplateResult, css, html, nothing } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 
 import PFAlert from "@patternfly/patternfly/components/Alert/alert.css";
@@ -39,6 +40,68 @@ import {
     User,
     UserPath,
 } from "@goauthentik/api";
+
+const buttonSpace = css`
+    .ak-local-button-collection {
+        display: flex;
+        flex-wrap: wrap;
+        align-content: flex-start;
+        align-items: flex-start;
+        justify-content: flex-start;
+        gap: var(--pf-global--spacer--md);
+    }
+
+    .ak-local-button-collection > * {
+        margin: 0;
+        flex-shrink: 0;
+        flex-grow: 0;
+        flex-basis: 18ch;
+    }
+`;
+
+export async function doUserRecoveryRetrieve(item: User) {
+    return new CoreApi(DEFAULT_CONFIG)
+        .coreUsersRecoveryRetrieve({
+            id: item.pk,
+        })
+        .then((rec) => {
+            writeToClipboard(
+                rec.link,
+                true,
+                MessageLevel.success,
+                "Successfully generated recovery link. A copy is now in your clipboard."
+            );
+        })
+        .catch((ex: ResponseError) => {
+            ex.response.json().then(() => {
+                showMessage({
+                    level: MessageLevel.error,
+                    message: msg("No recovery flow is configured."),
+                });
+            });
+        });
+}
+
+export function renderEmailRecoveryAvailable(user: User) {
+    return html`<ak-forms-modal .closeAfterSuccessfulSubmit=${false}>
+        <span slot="submit"> ${msg("Send link")} </span>
+        <span slot="header"> ${msg("Send recovery link to user")} </span>
+        <ak-user-reset-email-form slot="form" .user=${user}> </ak-user-reset-email-form>
+        <button slot="trigger" class="pf-c-button pf-m-secondary">
+            ${msg("Email recovery link")}
+        </button>
+    </ak-forms-modal>`;
+}
+
+export function renderEmailRecoveryUnavailable() {
+    return html`<span
+        >${msg("Recovery link cannot be emailed, user has no email address saved.")}</span
+    >`;
+}
+
+export function renderEmailRecovery(user: User) {
+    return user.email ? renderEmailRecoveryAvailable(user) : renderEmailRecoveryUnavailable();
+}
 
 @customElement("ak-user-list")
 export class UserListPage extends TablePage<User> {
@@ -74,7 +137,7 @@ export class UserListPage extends TablePage<User> {
     me?: SessionUser;
 
     static get styles(): CSSResult[] {
-        return super.styles.concat(PFDescriptionList, PFCard, PFAlert);
+        return super.styles.concat(PFDescriptionList, PFCard, PFAlert, buttonSpace);
     }
 
     constructor() {
@@ -118,41 +181,45 @@ export class UserListPage extends TablePage<User> {
         const shouldShowWarning = this.selectedElements.find((el) => {
             return el.pk === currentUser?.user.pk || el.pk == currentUser?.original?.pk;
         });
+
+        const deleteBulkMetadata = (item: User) => [
+            { key: msg("Username"), value: item.username },
+            { key: msg("ID"), value: item.pk.toString() },
+            { key: msg("UID"), value: item.uid },
+        ];
+
+        const deleteBulkUsedBy = (item: User) =>
+            new CoreApi(DEFAULT_CONFIG).coreUsersUsedByList({
+                id: item.pk,
+            });
+
+        const deleteBulkExecute = (item: User) =>
+            new CoreApi(DEFAULT_CONFIG).coreUsersDestroy({
+                id: item.pk,
+            });
+
+        const warning = () =>
+            html`<div slot="notice" class="pf-c-form__alert">
+                <div class="pf-c-alert pf-m-inline pf-m-warning">
+                    <div class="pf-c-alert__icon">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <h4 class="pf-c-alert__title">
+                        ${msg(
+                            str`Warning: You're about to delete the user you're logged in as (${shouldShowWarning.username}). Proceed at your own risk.`
+                        )}
+                    </h4>
+                </div>
+            </div>`;
+
         return html`<ak-forms-delete-bulk
             objectLabel=${msg("User(s)")}
             .objects=${this.selectedElements}
-            .metadata=${(item: User) => {
-                return [
-                    { key: msg("Username"), value: item.username },
-                    { key: msg("ID"), value: item.pk.toString() },
-                    { key: msg("UID"), value: item.uid },
-                ];
-            }}
-            .usedBy=${(item: User) => {
-                return new CoreApi(DEFAULT_CONFIG).coreUsersUsedByList({
-                    id: item.pk,
-                });
-            }}
-            .delete=${(item: User) => {
-                return new CoreApi(DEFAULT_CONFIG).coreUsersDestroy({
-                    id: item.pk,
-                });
-            }}
+            .metadata=${deleteBulkMetadata}
+            .usedBy=${deleteBulkUsedBy}
+            .delete=${deleteBulkExecute}
         >
-            ${shouldShowWarning
-                ? html`<div slot="notice" class="pf-c-form__alert">
-                      <div class="pf-c-alert pf-m-inline pf-m-warning">
-                          <div class="pf-c-alert__icon">
-                              <i class="fas fa-exclamation-circle"></i>
-                          </div>
-                          <h4 class="pf-c-alert__title">
-                              ${msg(
-                                  str`Warning: You're about to delete the user you're logged in as (${shouldShowWarning.username}). Proceed at your own risk.`,
-                              )}
-                          </h4>
-                      </div>
-                  </div>`
-                : html``}
+            ${shouldShowWarning ? warning() : nothing}
             <button ?disabled=${disabled} slot="trigger" class="pf-c-button pf-m-danger">
                 ${msg("Delete")}
             </button>
@@ -160,6 +227,15 @@ export class UserListPage extends TablePage<User> {
     }
 
     renderToolbarAfter(): TemplateResult {
+        const onToggleHideDeactivated = () => {
+            this.hideDeactivated = !this.hideDeactivated;
+            this.page = 1;
+            this.fetch();
+            updateURLParams({
+                hideDeactivated: this.hideDeactivated,
+            });
+        };
+
         return html`&nbsp;
             <div class="pf-c-toolbar__group pf-m-filter-group">
                 <div class="pf-c-toolbar__item pf-m-search-filter">
@@ -169,14 +245,7 @@ export class UserListPage extends TablePage<User> {
                                 class="pf-c-switch__input"
                                 type="checkbox"
                                 ?checked=${this.hideDeactivated}
-                                @change=${() => {
-                                    this.hideDeactivated = !this.hideDeactivated;
-                                    this.page = 1;
-                                    this.fetch();
-                                    updateURLParams({
-                                        hideDeactivated: this.hideDeactivated,
-                                    });
-                                }}
+                                @change=${onToggleHideDeactivated}
                             />
                             <span class="pf-c-switch__toggle">
                                 <span class="pf-c-switch__toggle-icon">
@@ -194,6 +263,22 @@ export class UserListPage extends TablePage<User> {
         const canImpersonate =
             rootInterface()?.config?.capabilities.includes(CapabilitiesEnum.CanImpersonate) &&
             item.pk !== this.me?.user.pk;
+
+        const startImpersonation = () => () =>
+            new CoreApi(DEFAULT_CONFIG)
+                .coreUsersImpersonateCreate({
+                    id: item.pk,
+                })
+                .then(() => {
+                    window.location.href = "/";
+                });
+
+        const impersonateMessage = () => html`
+            <ak-action-button class="pf-m-tertiary" .apiRequest=${startImpersonation}>
+                ${msg("Impersonate")}
+            </ak-action-button>
+        `;
+
         return [
             html`<a href="#/identity/users/${item.pk}">
                 <div>${item.username}</div>
@@ -213,28 +298,36 @@ export class UserListPage extends TablePage<User> {
                         </pf-tooltip>
                     </button>
                 </ak-forms-modal>
-                ${canImpersonate
-                    ? html`
-                          <ak-action-button
-                              class="pf-m-tertiary"
-                              .apiRequest=${() => {
-                                  return new CoreApi(DEFAULT_CONFIG)
-                                      .coreUsersImpersonateCreate({
-                                          id: item.pk,
-                                      })
-                                      .then(() => {
-                                          window.location.href = "/";
-                                      });
-                              }}
-                          >
-                              ${msg("Impersonate")}
-                          </ak-action-button>
-                      `
-                    : html``}`,
+                ${canImpersonate ? impersonateMessage() : nothing}`,
         ];
     }
 
     renderExpanded(item: User): TemplateResult {
+        const toggleUserIsActive = () =>
+            new CoreApi(DEFAULT_CONFIG).coreUsersPartialUpdate({
+                id: item.pk,
+                patchedUserRequest: {
+                    isActive: !item.isActive,
+                },
+            });
+
+        const renderRecoveryFlow = () => html`
+            <ak-action-button
+                class="pf-m-secondary"
+                .apiRequest=${() => doUserRecoveryRetrieve(item)}
+            >
+                ${msg("View recovery link")}
+            </ak-action-button>
+            ${renderEmailRecovery(item)}
+        `;
+
+        const renderRecoveryUnavailable = () =>
+            html` <p>
+                ${msg(
+                    "To let a user directly reset a their password, configure a recovery flow on the currently active tenant."
+                )}
+            </p>`;
+
         return html`<td role="cell" colspan="3">
                 <div class="pf-c-table__expandable-row-content">
                     <dl class="pf-c-description-list pf-m-horizontal">
@@ -264,16 +357,7 @@ export class UserListPage extends TablePage<User> {
                                     <ak-user-active-form
                                         .obj=${item}
                                         objectLabel=${msg("User")}
-                                        .delete=${() => {
-                                            return new CoreApi(
-                                                DEFAULT_CONFIG,
-                                            ).coreUsersPartialUpdate({
-                                                id: item.pk,
-                                                patchedUserRequest: {
-                                                    isActive: !item.isActive,
-                                                },
-                                            });
-                                        }}
+                                        .delete=${toggleUserIsActive}
                                     >
                                         <button slot="trigger" class="pf-c-button pf-m-warning">
                                             ${item.isActive ? msg("Deactivate") : msg("Activate")}
@@ -287,7 +371,7 @@ export class UserListPage extends TablePage<User> {
                                 <span class="pf-c-description-list__text">${msg("Recovery")}</span>
                             </dt>
                             <dd class="pf-c-description-list__description">
-                                <div class="pf-c-description-list__text">
+                                <div class="pf-c-description-list__text ak-local-button-collection">
                                     <ak-forms-modal size=${PFSize.Medium}>
                                         <span slot="submit">${msg("Update password")}</span>
                                         <span slot="header">${msg("Update password")}</span>
@@ -300,70 +384,8 @@ export class UserListPage extends TablePage<User> {
                                         </button>
                                     </ak-forms-modal>
                                     ${rootInterface()?.tenant?.flowRecovery
-                                        ? html`
-                                              <ak-action-button
-                                                  class="pf-m-secondary"
-                                                  .apiRequest=${() => {
-                                                      return new CoreApi(DEFAULT_CONFIG)
-                                                          .coreUsersRecoveryRetrieve({
-                                                              id: item.pk,
-                                                          })
-                                                          .then((rec) => {
-                                                              showMessage({
-                                                                  level: MessageLevel.success,
-                                                                  message: msg(
-                                                                      "Successfully generated recovery link",
-                                                                  ),
-                                                                  description: rec.link,
-                                                              });
-                                                          })
-                                                          .catch((ex: ResponseError) => {
-                                                              ex.response.json().then(() => {
-                                                                  showMessage({
-                                                                      level: MessageLevel.error,
-                                                                      message: msg(
-                                                                          "No recovery flow is configured.",
-                                                                      ),
-                                                                  });
-                                                              });
-                                                          });
-                                                  }}
-                                              >
-                                                  ${msg("Copy recovery link")}
-                                              </ak-action-button>
-                                              ${item.email
-                                                  ? html`<ak-forms-modal
-                                                        .closeAfterSuccessfulSubmit=${false}
-                                                    >
-                                                        <span slot="submit">
-                                                            ${msg("Send link")}
-                                                        </span>
-                                                        <span slot="header">
-                                                            ${msg("Send recovery link to user")}
-                                                        </span>
-                                                        <ak-user-reset-email-form
-                                                            slot="form"
-                                                            .user=${item}
-                                                        >
-                                                        </ak-user-reset-email-form>
-                                                        <button
-                                                            slot="trigger"
-                                                            class="pf-c-button pf-m-secondary"
-                                                        >
-                                                            ${msg("Email recovery link")}
-                                                        </button>
-                                                    </ak-forms-modal>`
-                                                  : html`<span
-                                                        >${msg(
-                                                            "Recovery link cannot be emailed, user has no email address saved.",
-                                                        )}</span
-                                                    >`}
-                                          `
-                                        : html` <p>
-                                              ${msg(
-                                                  "To let a user directly reset a their password, configure a recovery flow on the currently active tenant.",
-                                              )}
-                                          </p>`}
+                                        ? renderRecoveryFlow()
+                                        : renderRecoveryUnavailable()}
                                 </div>
                             </dd>
                         </div>

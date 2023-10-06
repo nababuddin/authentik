@@ -983,10 +983,6 @@
         <source>Validate SSL Certificates of upstream servers.</source>
         <target>验证上游服务器的 SSL 证书。</target>
       </trans-unit>
-      <trans-unit id="s9c73dced379c37a2">
-        <source>Use this provider with nginx's auth_request or traefik's forwardAuth. Each application/domain needs its own provider. Additionally, on each domain, /outpost.goauthentik.io must be routed to the outpost (when using a manged outpost, this is done for you).</source>
-        <target>将此提供程序与 nginx 的 auth_request 或 traefik 的 ForwardAuth 一起使用。每个应用程序/域都需要自己的提供商。此外，在每个域上，/outpost.goauthentik.io必须路由到 Outpost（使用托管的 Outpost 时，这是为您完成的）。</target>
-      </trans-unit>
       <trans-unit id="s44c90273f08fb718">
         <source>Use this provider with nginx's auth_request or traefik's forwardAuth. Only a single provider is required per root domain. You can't do per-application authorization, but you don't have to create a provider for each application.</source>
         <target>将此提供程序与 nginx 的 auth_request 或 traefik 的 ForwardAuth 一起使用。每个根域只需要一个提供程序。您无法执行每个应用程序的授权，但不必为每个应用程序创建提供程序。</target>
@@ -3434,14 +3430,6 @@ doesn't pass when either or both of the selected options are equal or above the 
         <source>User Info</source>
         <target>用户信息</target>
       </trans-unit>
-      <trans-unit id="s06f79477aff0576c">
-        <source>To create a recovery link, the current tenant needs to have a recovery flow configured.</source>
-        <target>要创建恢复链接，当前租户需要配置恢复流程。</target>
-      </trans-unit>
-      <trans-unit id="sed80a99ca1491909">
-        <source>Reset Password</source>
-        <target>重置密码</target>
-      </trans-unit>
       <trans-unit id="sc44bae5cde0083fa">
         <source>Actions over the last week (per 8 hours)</source>
       </trans-unit>
@@ -5877,6 +5865,12 @@ Bindings to groups/users are checked against the user of the event.</source>
 </trans-unit>
 <trans-unit id="se9e9e1d6799b86a5">
   <source>WebAuthn not supported by browser.</source>
+</trans-unit>
+<trans-unit id="sff0ac1ace2d90709">
+  <source>Use this provider with nginx's auth_request or traefik's forwardAuth. Each application/domain needs its own provider. Additionally, on each domain, /outpost.goauthentik.io must be routed to the outpost (when using a managed outpost, this is done for you).</source>
+</trans-unit>
+<trans-unit id="s08a54b6f77303e41">
+  <source>View recovery link</source>
 </trans-unit>
     </body>
   </file>

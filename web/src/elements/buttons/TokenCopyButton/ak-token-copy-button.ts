@@ -1,7 +1,7 @@
 import { DEFAULT_CONFIG } from "@goauthentik/common/api/config";
+import { writeToClipboard } from "@goauthentik/elements/utils/writeToClipboard";
 import { MessageLevel } from "@goauthentik/common/messages";
 import { showMessage } from "@goauthentik/elements/messages/MessageContainer";
-import { isSafari } from "@goauthentik/elements/utils/isSafari";
 
 import { customElement, property } from "lit/decorators.js";
 
@@ -56,30 +56,7 @@ export class TokenCopyButton extends BaseTaskButton {
         if (!isTokenView(token)) {
             throw new Error(`Unrecognized return from server: ${token}`);
         }
-
-        // Insecure origins may not have access to the clipboard. Show a message instead.
-        if (!navigator.clipboard) {
-            showMessage({
-                level: MessageLevel.info,
-                message: token.key as string,
-            });
-            return;
-        }
-
-        // Safari only allows navigator.clipboard.write with native clipboard items.
-        if (isSafari()) {
-            navigator.clipboard.write([
-                new ClipboardItem({
-                    "text/plain": new Blob([token.key as string], {
-                        type: "text/plain",
-                    }),
-                }),
-            ]);
-            return;
-        }
-
-        // Default behavior: write the token to the clipboard.
-        navigator.clipboard.writeText(token.key as string);
+        writeToClipboard(token.key as string);
     }
 
     async onError(error: unknown) {
