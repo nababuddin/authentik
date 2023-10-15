@@ -64,6 +64,7 @@ jobs:
           - proxy
           - ldap
           - radius
+          - rac
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -115,6 +116,7 @@ jobs:
           - proxy
           - ldap
           - radius
+          - rac
         goos: [linux]
         goarch: [amd64, arm64]
     steps:
