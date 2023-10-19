@@ -3,14 +3,20 @@ import { showMessage } from "@goauthentik/elements/messages/MessageContainer";
 
 import { isSafari } from "./isSafari";
 
-export function writeToClipboard(message: string, withMessage = false, level = MessageLevel.info, description?: string) {
+export function writeToClipboard(
+    message: string,
+    withMessage = false,
+    level = MessageLevel.info,
+    description?: string,
+) {
     // Insecure origins may not have access to the clipboard. Show a message instead.
 
-    const doWithMessage = () => showMessage({
-        level,
-        message,
-        description,
-    });
+    const doWithMessage = () =>
+        showMessage({
+            level,
+            message,
+            description,
+        });
 
     if (!navigator.clipboard) {
         doWithMessage();

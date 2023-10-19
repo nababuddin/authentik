@@ -5,7 +5,6 @@ from socket import gethostname
 from typing import Any, Optional
 from urllib.parse import urlparse
 
-import yaml
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from django.core.cache import cache
@@ -16,6 +15,7 @@ from docker.constants import DEFAULT_UNIX_SOCKET
 from kubernetes.config.incluster_config import SERVICE_TOKEN_FILENAME
 from kubernetes.config.kube_config import KUBE_CONFIG_DEFAULT_LOCATION
 from structlog.stdlib import get_logger
+from yaml import safe_load
 
 from authentik.events.monitored_tasks import (
     MonitoredTask,
@@ -25,6 +25,7 @@ from authentik.events.monitored_tasks import (
 )
 from authentik.lib.config import CONFIG
 from authentik.lib.utils.reflection import path_to_class
+from authentik.outposts.consumer import OUTPOST_GROUP
 from authentik.outposts.controllers.base import BaseController, ControllerException
 from authentik.outposts.controllers.docker import DockerClient
 from authentik.outposts.controllers.kubernetes import KubernetesClient
@@ -34,7 +35,6 @@ from authentik.outposts.models import (
     Outpost,
     OutpostModel,
     OutpostServiceConnection,
-    OutpostState,
     OutpostType,
     ServiceConnectionInvalid,
 )
@@ -243,10 +243,9 @@ def _outpost_single_update(outpost: Outpost, layer=None):
     outpost.build_user_permissions(outpost.user)
     if not layer:  # pragma: no cover
         layer = get_channel_layer()
-    for state in OutpostState.for_outpost(outpost):
-        for channel in state.channel_ids:
-            LOGGER.debug("sending update", channel=channel, instance=state.uid, outpost=outpost)
-            async_to_sync(layer.send)(channel, {"type": "event.update"})
+    group = OUTPOST_GROUP % {"outpost_pk": str(outpost.pk)}
+    LOGGER.debug("sending update", channel=group, outpost=outpost)
+    async_to_sync(layer.group_send)(group, {"type": "event.update"})
 
 
 @CELERY_APP.task(
@@ -279,7 +278,7 @@ def outpost_connection_discovery(self: MonitoredTask):
             with kubeconfig_path.open("r", encoding="utf8") as _kubeconfig:
                 KubernetesServiceConnection.objects.create(
                     name=kubeconfig_local_name,
-                    kubeconfig=yaml.safe_load(_kubeconfig),
+                    kubeconfig=safe_load(_kubeconfig),
                 )
     unix_socket_path = urlparse(DEFAULT_UNIX_SOCKET).path
     socket = Path(unix_socket_path)

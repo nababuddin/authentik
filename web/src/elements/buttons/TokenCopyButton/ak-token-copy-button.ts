@@ -1,7 +1,7 @@
 import { DEFAULT_CONFIG } from "@goauthentik/common/api/config";
-import { writeToClipboard } from "@goauthentik/elements/utils/writeToClipboard";
 import { MessageLevel } from "@goauthentik/common/messages";
 import { showMessage } from "@goauthentik/elements/messages/MessageContainer";
+import { writeToClipboard } from "@goauthentik/elements/utils/writeToClipboard";
 
 import { customElement, property } from "lit/decorators.js";
 

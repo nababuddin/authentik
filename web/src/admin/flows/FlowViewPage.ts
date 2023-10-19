@@ -2,6 +2,8 @@ import "@goauthentik/admin/flows/BoundStagesList";
 import "@goauthentik/admin/flows/FlowDiagram";
 import "@goauthentik/admin/flows/FlowForm";
 import "@goauthentik/admin/policies/BoundPoliciesList";
+import { DesignationToLabel } from "@goauthentik/app/admin/flows/utils";
+import "@goauthentik/app/elements/rbac/ObjectPermissionsPage";
 import { AndNext, DEFAULT_CONFIG } from "@goauthentik/common/api/config";
 import "@goauthentik/components/events/ObjectChangelog";
 import { AKElement } from "@goauthentik/elements/Base";
@@ -21,7 +23,12 @@ import PFPage from "@patternfly/patternfly/components/Page/page.css";
 import PFGrid from "@patternfly/patternfly/layouts/Grid/grid.css";
 import PFBase from "@patternfly/patternfly/patternfly-base.css";
 
-import { Flow, FlowsApi, ResponseError } from "@goauthentik/api";
+import {
+    Flow,
+    FlowsApi,
+    RbacPermissionsAssignedByUsersListModelEnum,
+    ResponseError,
+} from "@goauthentik/api";
 
 @customElement("ak-flow-view")
 export class FlowViewPage extends AKElement {
@@ -70,13 +77,43 @@ export class FlowViewPage extends AKElement {
                         <div
                             class="pf-c-card pf-l-grid__item pf-m-12-col pf-m-2-col-on-xl pf-m-2-col-on-2xl"
                         >
-                            <div class="pf-c-card__title">${msg("Related actions")}</div>
+                            <div class="pf-c-card__title">${msg("Flow Info")}</div>
                             <div class="pf-c-card__body">
                                 <dl class="pf-c-description-list">
                                     <div class="pf-c-description-list__group">
                                         <dt class="pf-c-description-list__term">
                                             <span class="pf-c-description-list__text"
-                                                >${msg("Edit")}</span
+                                                >${msg("Name")}</span
+                                            >
+                                        </dt>
+                                        <dd class="pf-c-description-list__description">
+                                            <div class="pf-c-description-list__text">
+                                                ${this.flow.name}
+                                            </div>
+                                        </dd>
+                                        <dt class="pf-c-description-list__term">
+                                            <span class="pf-c-description-list__text"
+                                                >${msg("Slug")}</span
+                                            >
+                                        </dt>
+                                        <dd class="pf-c-description-list__description">
+                                            <div class="pf-c-description-list__text">
+                                                <code>${this.flow.slug}</code>
+                                            </div>
+                                        </dd>
+                                        <dt class="pf-c-description-list__term">
+                                            <span class="pf-c-description-list__text"
+                                                >${msg("Designation")}</span
+                                            >
+                                        </dt>
+                                        <dd class="pf-c-description-list__description">
+                                            <div class="pf-c-description-list__text">
+                                                ${DesignationToLabel(this.flow.designation)}
+                                            </div>
+                                        </dd>
+                                        <dt class="pf-c-description-list__term">
+                                            <span class="pf-c-description-list__text"
+                                                >${msg("Related actions")}</span
                                             >
                                         </dt>
                                         <dd class="pf-c-description-list__description">
@@ -236,6 +273,12 @@ export class FlowViewPage extends AKElement {
                         </div>
                     </div>
                 </div>
+                <ak-rbac-object-permission-page
+                    slot="page-permissions"
+                    data-tab-title="${msg("Permissions")}"
+                    model=${RbacPermissionsAssignedByUsersListModelEnum.FlowsFlow}
+                    objectPk=${this.flow.pk}
+                ></ak-rbac-object-permission-page>
             </ak-tabs>`;
     }
 }

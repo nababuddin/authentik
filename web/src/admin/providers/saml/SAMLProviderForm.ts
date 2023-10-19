@@ -66,8 +66,7 @@ export class SAMLProviderFormPage extends ModelForm<SAMLProvider, number> {
     }
 
     renderForm(): TemplateResult {
-        return html`<form class="pf-c-form pf-m-horizontal">
-            <ak-form-element-horizontal label=${msg("Name")} ?required=${true} name="name">
+        return html` <ak-form-element-horizontal label=${msg("Name")} ?required=${true} name="name">
                 <input
                     type="text"
                     value="${ifDefined(this.instance?.name)}"
@@ -318,6 +317,24 @@ export class SAMLProviderFormPage extends ModelForm<SAMLProvider, number> {
                         </p>
                         <ak-utils-time-delta-help></ak-utils-time-delta-help>
                     </ak-form-element-horizontal>
+                    <ak-form-element-horizontal
+                        label=${msg("Default relay state")}
+                        ?required=${true}
+                        name="defaultRelayState"
+                    >
+                        <input
+                            type="text"
+                            value="${this.instance?.defaultRelayState || ""}"
+                            class="pf-c-form-control"
+                            required
+                        />
+                        <p class="pf-c-form__helper-text">
+                            ${msg(
+                                "When using IDP-initiated logins, the relay state will be set to this value.",
+                            )}
+                        </p>
+                        <ak-utils-time-delta-help></ak-utils-time-delta-help>
+                    </ak-form-element-horizontal>
 
                     <ak-form-element-horizontal
                         label=${msg("Digest algorithm")}
@@ -382,7 +399,6 @@ export class SAMLProviderFormPage extends ModelForm<SAMLProvider, number> {
                         </ak-radio>
                     </ak-form-element-horizontal>
                 </div>
-            </ak-form-group>
-        </form>`;
+            </ak-form-group>`;
     }
 }

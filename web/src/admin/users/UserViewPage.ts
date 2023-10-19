@@ -3,10 +3,12 @@ import "@goauthentik/admin/users/UserActiveForm";
 import "@goauthentik/admin/users/UserChart";
 import "@goauthentik/admin/users/UserForm";
 import "@goauthentik/admin/users/UserPasswordForm";
+import "@goauthentik/app/admin/users/UserAssignedGlobalPermissionsTable";
+import "@goauthentik/app/admin/users/UserAssignedObjectPermissionsTable";
 import { me } from "@goauthentik/app/common/users";
+import "@goauthentik/app/elements/rbac/ObjectPermissionsPage";
 import { DEFAULT_CONFIG } from "@goauthentik/common/api/config";
 import { EVENT_REFRESH } from "@goauthentik/common/constants";
-import { MessageLevel } from "@goauthentik/common/messages";
 import "@goauthentik/components/events/ObjectChangelog";
 import "@goauthentik/components/events/UserEvents";
 import { AKElement, rootInterface } from "@goauthentik/elements/Base";
@@ -18,7 +20,6 @@ import "@goauthentik/elements/Tabs";
 import "@goauthentik/elements/buttons/ActionButton";
 import "@goauthentik/elements/buttons/SpinnerButton";
 import "@goauthentik/elements/forms/ModalForm";
-import { showMessage } from "@goauthentik/elements/messages/MessageContainer";
 import "@goauthentik/elements/oauth/UserRefreshList";
 import "@goauthentik/elements/user/SessionList";
 import "@goauthentik/elements/user/UserConsentList";
@@ -35,13 +36,17 @@ import PFPage from "@patternfly/patternfly/components/Page/page.css";
 import PFGrid from "@patternfly/patternfly/layouts/Grid/grid.css";
 import PFBase from "@patternfly/patternfly/patternfly-base.css";
 import PFDisplay from "@patternfly/patternfly/utilities/Display/display.css";
-import PFFlex from "@patternfly/patternfly/utilities/Flex/flex.css";
 import PFSizing from "@patternfly/patternfly/utilities/Sizing/sizing.css";
 
-import { CapabilitiesEnum, CoreApi, SessionUser, User } from "@goauthentik/api";
+import {
+    CapabilitiesEnum,
+    CoreApi,
+    RbacPermissionsAssignedByUsersListModelEnum,
+    SessionUser,
+    User,
+} from "@goauthentik/api";
 
-import "./UserDevicesList";
-import { doUserRecoveryRetrieve, renderEmailRecovery } from "./UserListPage";
+import "./UserDevicesTable";
 
 @customElement("ak-user-view")
 export class UserViewPage extends AKElement {
@@ -69,7 +74,6 @@ export class UserViewPage extends AKElement {
         return [
             PFBase,
             PFPage,
-            PFFlex,
             PFButton,
             PFDisplay,
             PFGrid,
@@ -79,7 +83,7 @@ export class UserViewPage extends AKElement {
             PFSizing,
             css`
                 .pf-c-description-list__description ak-action-button {
-margin-right: var(--pf-global--spaces-xs);
+                    margin-right: var(--pf-global--spaces-xs);
                     margin-bottom: var(--pf-global--spaces-xs);
                 }
                 .ak-button-collection {
@@ -226,7 +230,7 @@ margin-right: var(--pf-global--spaces-xs);
                                             content=${this.user.isActive
                                                 ? msg("Lock the user out of this system")
                                                 : msg(
-                                                      "Allow the user to log in and use this system"
+                                                      "Allow the user to log in and use this system",
                                                   )}
                                         >
                                             ${this.user.isActive
@@ -253,7 +257,7 @@ margin-right: var(--pf-global--spaces-xs);
                                               <pf-tooltip
                                                   position="top"
                                                   content=${msg(
-                                                      "Temporarily assume the identity of this user"
+                                                      "Temporarily assume the identity of this user",
                                                   )}
                                               >
                                                   ${msg("Impersonate")}
@@ -297,7 +301,7 @@ margin-right: var(--pf-global--spaces-xs);
                                     <pf-tooltip
                                         position="top"
                                         content=${msg(
-                                            "Create a link for this user to reset their password"
+                                            "Create a link for this user to reset their password",
                                         )}
                                     >
                                         ${msg("View recovery link")}
@@ -348,7 +352,7 @@ margin-right: var(--pf-global--spaces-xs);
                                 : html`
                                       <p>
                                           ${msg(
-                                              "Edit the notes attribute of this user to add notes here."
+                                              "Edit the notes attribute of this user to add notes here.",
                                           )}
                                       </p>
                                   `}
@@ -433,7 +437,35 @@ margin-right: var(--pf-global--spaces-xs);
             >
                 <div class="pf-c-card">
                     <div class="pf-c-card__body">
-                        <ak-user-device-list userId=${this.user.pk}> </ak-user-device-list>
+                        <ak-user-device-table userId=${this.user.pk}> </ak-user-device-table>
+                    </div>
+                </div>
+            </section>
+            <ak-rbac-object-permission-page
+                slot="page-permissions"
+                data-tab-title="${msg("Permissions")}"
+                model=${RbacPermissionsAssignedByUsersListModelEnum.CoreUser}
+                objectPk=${this.user.pk}
+            ></ak-rbac-object-permission-page>
+            <section
+                slot="page-mfa-assigned-permissions"
+                data-tab-title="${msg("Assigned permissions")}"
+                class="pf-c-page__main-section pf-m-no-padding-mobile"
+            >
+                <div class="pf-l-grid pf-m-gutter">
+                    <div class="pf-c-card pf-l-grid__item pf-m-12-col">
+                        <div class="pf-c-card__title">${msg("Assigned global permissions")}</div>
+                        <div class="pf-c-card__body">
+                            <ak-user-assigned-global-permissions-table userId=${this.user.pk}>
+                            </ak-user-assigned-global-permissions-table>
+                        </div>
+                    </div>
+                    <div class="pf-c-card pf-l-grid__item pf-m-12-col">
+                        <div class="pf-c-card__title">${msg("Assigned object permissions")}</div>
+                        <div class="pf-c-card__body">
+                            <ak-user-assigned-object-permissions-table userId=${this.user.pk}>
+                            </ak-user-assigned-object-permissions-table>
+                        </div>
                     </div>
                 </div>
             </section>

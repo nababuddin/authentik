@@ -68,42 +68,41 @@ export class RelatedUserAdd extends Form<{ users: number[] }> {
         return data;
     }
 
-    renderInlineForm(): TemplateResult {
-        return html`${this.group?.isSuperuser ? html`` : html``}
-            <ak-form-element-horizontal label=${msg("Users to add")} name="users">
-                <div class="pf-c-input-group">
-                    <ak-group-member-select-table
-                        .confirm=${(items: User[]) => {
-                            this.usersToAdd = items;
-                            this.requestUpdate();
-                            return Promise.resolve();
-                        }}
-                    >
-                        <button slot="trigger" class="pf-c-button pf-m-control" type="button">
-                            <pf-tooltip position="top" content=${msg("Add users")}>
-                                <i class="fas fa-plus" aria-hidden="true"></i>
-                            </pf-tooltip>
-                        </button>
-                    </ak-group-member-select-table>
-                    <div class="pf-c-form-control">
-                        <ak-chip-group>
-                            ${this.usersToAdd.map((user) => {
-                                return html`<ak-chip
-                                    .removable=${true}
-                                    value=${ifDefined(user.pk)}
-                                    @remove=${() => {
-                                        const idx = this.usersToAdd.indexOf(user);
-                                        this.usersToAdd.splice(idx, 1);
-                                        this.requestUpdate();
-                                    }}
-                                >
-                                    ${UserOption(user)}
-                                </ak-chip>`;
-                            })}
-                        </ak-chip-group>
-                    </div>
+    renderForm(): TemplateResult {
+        return html` <ak-form-element-horizontal label=${msg("Users to add")} name="users">
+            <div class="pf-c-input-group">
+                <ak-group-member-select-table
+                    .confirm=${(items: User[]) => {
+                        this.usersToAdd = items;
+                        this.requestUpdate();
+                        return Promise.resolve();
+                    }}
+                >
+                    <button slot="trigger" class="pf-c-button pf-m-control" type="button">
+                        <pf-tooltip position="top" content=${msg("Add users")}>
+                            <i class="fas fa-plus" aria-hidden="true"></i>
+                        </pf-tooltip>
+                    </button>
+                </ak-group-member-select-table>
+                <div class="pf-c-form-control">
+                    <ak-chip-group>
+                        ${this.usersToAdd.map((user) => {
+                            return html`<ak-chip
+                                .removable=${true}
+                                value=${ifDefined(user.pk)}
+                                @remove=${() => {
+                                    const idx = this.usersToAdd.indexOf(user);
+                                    this.usersToAdd.splice(idx, 1);
+                                    this.requestUpdate();
+                                }}
+                            >
+                                ${UserOption(user)}
+                            </ak-chip>`;
+                        })}
+                    </ak-chip-group>
                 </div>
-            </ak-form-element-horizontal>`;
+            </div>
+        </ak-form-element-horizontal>`;
     }
 }
 

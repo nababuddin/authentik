@@ -49,8 +49,7 @@ export class RadiusProviderFormPage extends ModelForm<RadiusProvider, number> {
     // weird-- we're looking up Authentication flows, but we're storing them in the Authorization
     // field of the target Provider.
     renderForm(): TemplateResult {
-        return html`<form class="pf-c-form pf-m-horizontal">
-            <ak-form-element-horizontal label=${msg("Name")} ?required=${true} name="name">
+        return html` <ak-form-element-horizontal label=${msg("Name")} ?required=${true} name="name">
                 <input
                     type="text"
                     value="${ifDefined(this.instance?.name)}"
@@ -70,6 +69,26 @@ export class RadiusProviderFormPage extends ModelForm<RadiusProvider, number> {
                     required
                 ></ak-tenanted-flow-search>
                 <p class="pf-c-form__helper-text">${msg("Flow used for users to authenticate.")}</p>
+            </ak-form-element-horizontal>
+            <ak-form-element-horizontal name="mfaSupport">
+                <label class="pf-c-switch">
+                    <input
+                        class="pf-c-switch__input"
+                        type="checkbox"
+                        ?checked=${first(this.instance?.mfaSupport, true)}
+                    />
+                    <span class="pf-c-switch__toggle">
+                        <span class="pf-c-switch__toggle-icon">
+                            <i class="fas fa-check" aria-hidden="true"></i>
+                        </span>
+                    </span>
+                    <span class="pf-c-switch__label">${msg("Code-based MFA Support")}</span>
+                </label>
+                <p class="pf-c-form__helper-text">
+                    ${msg(
+                        "When enabled, code-based multi-factor authentication can be used by appending a semicolon and the TOTP code to the password. This should only be enabled if all users that will bind to this provider have a TOTP device configured, as otherwise a password may incorrectly be rejected if it contains a semicolon.",
+                    )}
+                </p>
             </ak-form-element-horizontal>
 
             <ak-form-group .expanded=${true}>
@@ -108,7 +127,6 @@ export class RadiusProviderFormPage extends ModelForm<RadiusProvider, number> {
                         </p>
                     </ak-form-element-horizontal>
                 </div>
-            </ak-form-group>
-        </form>`;
+            </ak-form-group>`;
     }
 }

@@ -69,7 +69,7 @@ export async function doUserRecoveryRetrieve(item: User) {
                 rec.link,
                 true,
                 MessageLevel.success,
-                "Successfully generated recovery link. A copy is now in your clipboard."
+                "Successfully generated recovery link. A copy is now in your clipboard.",
             );
         })
         .catch((ex: ResponseError) => {
@@ -206,7 +206,7 @@ export class UserListPage extends TablePage<User> {
                     </div>
                     <h4 class="pf-c-alert__title">
                         ${msg(
-                            str`Warning: You're about to delete the user you're logged in as (${shouldShowWarning.username}). Proceed at your own risk.`
+                            str`Warning: You're about to delete the user you're logged in as (${shouldShowWarning.username}). Proceed at your own risk.`,
                         )}
                     </h4>
                 </div>
@@ -324,7 +324,7 @@ export class UserListPage extends TablePage<User> {
         const renderRecoveryUnavailable = () =>
             html` <p>
                 ${msg(
-                    "To let a user directly reset a their password, configure a recovery flow on the currently active tenant."
+                    "To let a user directly reset a their password, configure a recovery flow on the currently active tenant.",
                 )}
             </p>`;
 
