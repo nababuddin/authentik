@@ -23,6 +23,7 @@ import "@goauthentik/elements/forms/ModalForm";
 import "@goauthentik/elements/oauth/UserRefreshList";
 import "@goauthentik/elements/user/SessionList";
 import "@goauthentik/elements/user/UserConsentList";
+import { doUserRecoveryRetrieve, renderEmailRecovery } from "@goauthentik/admin/users/UserListPage";
 
 import { msg, str } from "@lit/localize";
 import { CSSResult, TemplateResult, css, html } from "lit";
