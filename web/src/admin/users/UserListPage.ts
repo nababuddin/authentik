@@ -252,7 +252,7 @@ export class UserListPage extends TablePage<User> {
                                     <i class="fas fa-check" aria-hidden="true"></i>
                                 </span>
                             </span>
-                            <span class="pf-c-switch__label">${msg("Hide deactivated user")}</span>
+                            <span class="pf-c-switch__label">${msg("Hide deactivated users")}</span>
                         </label>
                     </div>
                 </div>
