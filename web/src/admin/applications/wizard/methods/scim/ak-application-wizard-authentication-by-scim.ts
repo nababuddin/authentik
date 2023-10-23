@@ -2,6 +2,7 @@ import "@goauthentik/admin/common/ak-crypto-certificate-search";
 import "@goauthentik/admin/common/ak-flow-search/ak-tenanted-flow-search";
 import { DEFAULT_CONFIG } from "@goauthentik/common/api/config";
 import { first } from "@goauthentik/common/utils";
+import "@goauthentik/components/ak-input-select-group/ak-input-select-multiple";
 import "@goauthentik/components/ak-switch-input";
 import "@goauthentik/components/ak-text-input";
 import "@goauthentik/elements/forms/FormGroup";
@@ -31,8 +32,8 @@ export class ApplicationWizardAuthenticationBySCIM extends BaseProviderPanel {
     constructor() {
         super();
         new PropertymappingsApi(DEFAULT_CONFIG)
-            .propertymappingsScopeList({
-                ordering: "scope_name",
+            .propertymappingsScimList({
+                ordering: "managed",
             })
             .then((propertyMappings: PaginatedSCIMMappingList) => {
                 this.propertyMappings = propertyMappings;
@@ -41,6 +42,26 @@ export class ApplicationWizardAuthenticationBySCIM extends BaseProviderPanel {
 
     render() {
         const provider = this.wizard.provider as SCIMProvider | undefined;
+
+        const propertyMappings = this.propertyMappings?.results ?? [];
+
+        const configuredMappings = (providerMappings: string[]) =>
+            propertyMappings.map((pm) => pm.pk).filter((pmpk) => providerMappings.includes(pmpk));
+
+        const managedMappings = (key: string) =>
+            propertyMappings
+                .filter((pm) => pm.managed === `goauthentik.io/providers/scim/${key}`)
+                .map((pm) => pm.pk);
+
+        const pmUserValues = provider?.propertyMappings
+            ? configuredMappings(provider?.propertyMappings ?? [])
+            : managedMappings("user");
+
+        const pmGroupValues = provider?.propertyMappingsGroup
+            ? configuredMappings(provider?.propertyMappingsGroup ?? [])
+            : managedMappings("group");
+
+        const propertyPairs = propertyMappings.map((pm) => [pm.pk, pm.name]);
 
         return html`<form class="pf-c-form pf-m-horizontal" @input=${this.handleChange}>
             <ak-text-input
@@ -66,7 +87,7 @@ export class ApplicationWizardAuthenticationBySCIM extends BaseProviderPanel {
                         value="${first(provider?.token, "")}"
                         required
                         help=${msg(
-                            "Token to authenticate with. Currently only bearer authentication is supported.",
+                            "Token to authenticate with. Currently only bearer authentication is supported."
                         )}
                     >
                     </ak-text-input>
@@ -90,7 +111,7 @@ export class ApplicationWizardAuthenticationBySCIM extends BaseProviderPanel {
                                     args.search = query;
                                 }
                                 const groups = await new CoreApi(DEFAULT_CONFIG).coreGroupsList(
-                                    args,
+                                    args
                                 );
                                 return groups.results;
                             }}
@@ -115,71 +136,32 @@ export class ApplicationWizardAuthenticationBySCIM extends BaseProviderPanel {
             <ak-form-group ?expanded=${true}>
                 <span slot="header"> ${msg("Attribute mapping")} </span>
                 <div slot="body" class="pf-c-form">
-                    <ak-form-element-horizontal
+                    <ak-input-select-multiple
                         label=${msg("User Property Mappings")}
                         ?required=${true}
                         name="propertyMappings"
-                    >
-                        <select class="pf-c-form-control" multiple>
-                            ${this.propertyMappings?.results.map((mapping) => {
-                                let selected = false;
-                                if (!provider?.propertyMappings) {
-                                    selected =
-                                        mapping.managed === "goauthentik.io/providers/scim/user" ||
-                                        false;
-                                } else {
-                                    selected = Array.from(provider?.propertyMappings).some((su) => {
-                                        return su == mapping.pk;
-                                    });
-                                }
-                                return html`<option
-                                    value=${ifDefined(mapping.pk)}
-                                    ?selected=${selected}
-                                >
-                                    ${mapping.name}
-                                </option>`;
-                            })}
-                        </select>
-                        <p class="pf-c-form__helper-text">
-                            ${msg("Property mappings used to user mapping.")}
-                        </p>
-                        <p class="pf-c-form__helper-text">
-                            ${msg("Hold control/command to select multiple items.")}
-                        </p>
-                    </ak-form-element-horizontal>
-                    <ak-form-element-horizontal
+                        .options=${propertyPairs}
+                        .values=${pmUserValues}
+                        .richhelp=${html` <p class="pf-c-form__helper-text">
+                                ${msg("Property mappings used for user mapping.")}
+                            </p>
+                            <p class="pf-c-form__helper-text">
+                                ${msg("Hold control/command to select multiple items.")}
+                            </p>`}
+                    ></ak-input-select-multiple>
+                    <ak-input-select-multiple
                         label=${msg("Group Property Mappings")}
                         ?required=${true}
                         name="propertyMappingsGroup"
-                    >
-                        <select class="pf-c-form-control" multiple>
-                            ${this.propertyMappings?.results.map((mapping) => {
-                                let selected = false;
-                                if (!provider?.propertyMappingsGroup) {
-                                    selected =
-                                        mapping.managed === "goauthentik.io/providers/scim/group";
-                                } else {
-                                    selected = Array.from(provider?.propertyMappingsGroup).some(
-                                        (su) => {
-                                            return su == mapping.pk;
-                                        },
-                                    );
-                                }
-                                return html`<option
-                                    value=${ifDefined(mapping.pk)}
-                                    ?selected=${selected}
-                                >
-                                    ${mapping.name}
-                                </option>`;
-                            })}
-                        </select>
-                        <p class="pf-c-form__helper-text">
-                            ${msg("Property mappings used to group creation.")}
-                        </p>
-                        <p class="pf-c-form__helper-text">
-                            ${msg("Hold control/command to select multiple items.")}
-                        </p>
-                    </ak-form-element-horizontal>
+                        .options=${propertyPairs}
+                        .values=${pmGroupValues}
+                        .richhelp=${html` <p class="pf-c-form__helper-text">
+                                ${msg("Property mappings used for group creation.")}
+                            </p>
+                            <p class="pf-c-form__helper-text">
+                                ${msg("Hold control/command to select multiple items.")}
+                            </p>`}
+                    ></ak-input-select-multiple>
                 </div>
             </ak-form-group>
         </form>`;
